@@ -9,6 +9,7 @@ fn main() {
     }
 }
 
+/// Orchestrates the process of reading election data, tallying votes, and writing results.
 fn run() -> Result<(), Box<dyn Error>> {
     let election = read_election("test_files/election.json")?;
     let votes = read_votes("test_files/votes.jsonl")?;
@@ -30,12 +31,13 @@ fn run() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-
+/// Reads the election data from a JSON file.
 fn read_election(filename: &str) -> Result<Election, Box<dyn Error>> {
     let election_data = fs::read_to_string(filename)?;
     Ok(serde_json::from_str(&election_data)?)
 }
 
+/// Reads the votes from a JSONL file.
 fn read_votes(filename: &str) -> Result<Vec<Vote>, Box<dyn Error>> {
     let votes_data = fs::read_to_string(filename)?;
     let votes: Result<Vec<_>, _> =votes_data
@@ -46,6 +48,7 @@ fn read_votes(filename: &str) -> Result<Vec<Vote>, Box<dyn Error>> {
     votes.map_err(|err| err.into())
 }
 
+/// Tallies the votes for each choice.
 fn tally_votes(votes: &[Vote]) -> HashMap<u32, u32> {
     votes.iter().fold(HashMap::new(), |mut tally, vote| {
         *tally.entry(vote.choice_id).or_insert(0) += 1;
@@ -53,6 +56,7 @@ fn tally_votes(votes: &[Vote]) -> HashMap<u32, u32> {
     })
 }
 
+/// Calculates the results for each choice based on the tally.
 fn calculate_choice_results(choices: &[Choice], tally: &HashMap<u32, u32>) -> Vec<ChoiceResult> {
     choices.iter().map(|choice|{
         ChoiceResult {
@@ -63,10 +67,12 @@ fn calculate_choice_results(choices: &[Choice], tally: &HashMap<u32, u32>) -> Ve
     }).collect()
 }
 
+/// Finds the winner from the choice results.
 fn find_winner(choice_results: &[ChoiceResult]) -> Option<&ChoiceResult> {
     choice_results.iter().max_by_key(|result| result.total_count)
 }
 
+/// Writes the election result to a JSON file.
 fn write_result(filename: &str, result: &ElectionResult) -> Result<(), Box<dyn Error>> {
     let result_json = serde_json::to_string_pretty(result)?;
     fs::write(filename, result_json)?;

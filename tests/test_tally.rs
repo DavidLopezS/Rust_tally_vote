@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use tally_votes::models::{Election, Vote, ChoiceResult, Choice};
 use std::error::Error;
 
+/// Tallies the votes and calculates the choice results.
 fn tally_votes(election: &Election, votes: &[Vote]) -> Result<Vec<ChoiceResult>, Box<dyn Error>> {
     let mut tally: HashMap<u32, u32> = HashMap::new();
     for vote in votes {
