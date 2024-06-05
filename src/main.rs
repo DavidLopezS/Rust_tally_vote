@@ -12,6 +12,11 @@ fn main() {
 fn run() -> Result<(), Box<dyn Error>> {
     let election = read_election("test_files/election.json")?;
     let votes = read_votes("test_files/votes.jsonl")?;
+
+    if !votes.iter().all(|vote| vote.contest_id == election.id){
+        return Err(Box::from("Contest ID in votes does not match contest ID in election"))
+    }
+
     let tally = tally_votes(&votes);
     let choice_results = calculate_choice_results(&election.choices, &tally);
     let winner = find_winner(&choice_results).cloned().expect("No winner found");
