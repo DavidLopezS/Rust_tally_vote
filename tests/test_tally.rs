@@ -1,14 +1,13 @@
 use std::collections::HashMap;
-use tally_votes::models::{Election, Vote, ChoiceResult, Choice, Result};
+use tally_votes::models::{Election, Vote, ChoiceResult, Choice};
+use std::error::Error;
 
-fn tally_votes(election: &Election, votes: &[Vote]) -> Result {
-    // Tally votes
+fn tally_votes(election: &Election, votes: &[Vote]) -> Result<Vec<ChoiceResult>, Box<dyn Error>> {
     let mut tally: HashMap<u32, u32> = HashMap::new();
     for vote in votes {
         *tally.entry(vote.choice_id).or_insert(0) += 1;
     }
 
-    // Prepare results
     let choice_results: Vec<ChoiceResult> = election.choices.iter().map(|choice| {
         ChoiceResult {
             choice_id: choice.id,
@@ -17,16 +16,7 @@ fn tally_votes(election: &Election, votes: &[Vote]) -> Result {
         }
     }).collect();
 
-    // Determine winner
-    let winner = choice_results.iter().max_by_key(|result| result.total_count).unwrap().clone();
-
-    // Create result
-    Result {
-        contest_id: election.id,
-        total_votes: votes.len() as u32,
-        results: choice_results,
-        winner,
-    }
+    Ok(choice_results)
 }
 
 #[cfg(test)]
@@ -52,9 +42,11 @@ mod tests {
             Vote { contest_id: 1, choice_id: 3 },
         ];
 
-        let result = tally_votes(&election, &votes);
+        let result = tally_votes(&election, &votes).unwrap();
 
-        assert_eq!(result.winner.choice_id, 1);
-        assert_eq!(result.total_votes, 4);
+        assert_eq!(result.iter().find(|&r| r.choice_id == 1).unwrap().total_count, 2);
+        assert_eq!(result.iter().find(|&r| r.choice_id == 2).unwrap().total_count, 1);
+        assert_eq!(result.iter().find(|&r| r.choice_id == 3).unwrap().total_count, 1);
+        assert_eq!(result.len(), 3);
     }
 }

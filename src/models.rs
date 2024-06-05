@@ -20,7 +20,7 @@ pub struct Vote {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Result {
+pub struct ElectionResult {
     pub contest_id: u32,
     pub total_votes: u32,
     pub results: Vec<ChoiceResult>,
