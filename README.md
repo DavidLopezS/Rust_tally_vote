@@ -2,9 +2,9 @@
 
 ### How to run
 
-In order to be able to build the binary you should run the command `cargo build --release`. Then, in order to run the exe, the following command should be executed `./target/release/my_project`. 
+In order to be able to build the binary you should run the command `cargo build --release`. Then, in order to run the exe, the following command should be executed `./target/release/tally_votes`. 
 
-If you want to run the project without creating the .exe file, you should run `cargo build` (if not executed previously as release), and then run the bash file.This will run the tests, and if successfull, will execute the real application.
+If you want to run the project without creating the .exe file, you should run `cargo build` (if not executed previously as release), run `chmod +x run.sh` in order to give permissions to the bash file, and then `run.sh` the bash file.This will run the tests, and if successfull, will execute the real application.
 
 ### Setup
 
